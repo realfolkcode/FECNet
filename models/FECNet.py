@@ -61,6 +61,5 @@ def load_weights(mdl, path):
         Arguments:
         mdl {torch.nn.Module} -- Pytorch model.
         path {str} --- path to model weights."""
-
-    path = 'https://drive.google.com/uc?export=download&id=1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx'
-    mdl.load_state_dict(torch.load(cached_file, map_location=torch.device('cpu')))
+    
+    mdl.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
