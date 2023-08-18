@@ -18,7 +18,7 @@ class FECNet(nn.Module):
     Keyword Arguments:
         pretrained {str} -- load pretraining weights
     """
-    def __init__(self, pretrained=False):
+    def __init__(self, pretrained=False, path=None):
         super(FECNet, self).__init__()
         growth_rate = 64
         depth = 100
@@ -35,7 +35,7 @@ class FECNet(nn.Module):
                         num_init_features=512)
 
         if (pretrained):
-            load_weights(self)
+            load_weights(self, path)
 
     def forward(self, x):
         feat = self.Inc(x)[1]
@@ -55,34 +55,12 @@ def save_response_content(response, destination):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
 
-def load_weights(mdl):
+def load_weights(mdl, path):
     """Download pretrained state_dict and load into model.
 
         Arguments:
-        mdl {torch.nn.Module} -- Pytorch model."""
+        mdl {torch.nn.Module} -- Pytorch model.
+        path {str} --- path to model weights."""
 
     path = 'https://drive.google.com/uc?export=download&id=1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx'
-
-
-    model_dir = os.path.join(os.getcwd(), './pretrained')
-    os.makedirs(model_dir, exist_ok=True)
-
-    cached_file = os.path.join(model_dir, 'FECNet_AS20112019p.pt')
-    if not os.path.exists(cached_file):
-        print('Downloading weights')
-        URL = "https://docs.google.com/uc?export=download"
-
-        session = requests.Session()
-        id = '1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx'
-
-        response = session.get(URL, params={'id': id}, stream=True)
-        token = get_confirm_token(response)
-
-        if token:
-            params = {'id': id, 'confirm': token}
-            response = session.get(URL, params=params, stream=True)
-
-        save_response_content(response, cached_file)
-
-
-    mdl.load_state_dict(torch.load(cached_file))
+    mdl.load_state_dict(torch.load(cached_file, map_location=torch.device('cpu')))
